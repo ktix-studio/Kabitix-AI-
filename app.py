@@ -156,13 +156,13 @@ if show_image:
     "Describe the image you want to create"
 )
 
-if st.button("🎨 Generate Image"):
-      with st.spinner("Generating image..."):
+if st.button(" Generate Image"):
+    with st.spinner("Generating image..."):
         image = generate_image(image_prompt)
         if image:
-        st.image(image)
-            else:
-        st.error("Image generation failed. Check Render logs.") 
+            st.image(image)
+        else:
+            st.error("Image generation failed. Check Render logs.") 
 text_prompt = st.chat_input("💬 Ask anything...")
 
 if text_prompt:
