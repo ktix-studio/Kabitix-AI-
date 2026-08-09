@@ -160,7 +160,7 @@ if st.button(" Generate Image"):
     with st.spinner("Generating image..."):
         image = generate_image(image_prompt)
         if image:
-            st.image(image)
+                st.image(image)
         else:
             st.error("Image generation failed. Check Render logs.") 
 text_prompt = st.chat_input("💬 Ask anything...")
