@@ -159,7 +159,7 @@ if show_image:
 if st.button("🎨 Generate Image"):
       with st.spinner("Generating image..."):
         image = generate_image(image_prompt)
-   if image:
+     if image:
         st.image(image)
     else:
         st.error("Image generation failed. Check Render logs.") 
