@@ -169,30 +169,32 @@ if text_prompt:
     prompt = text_prompt 
 
 if prompt:
+    st.session_state.messages.append(
+        {
+            "role": "user",
+            "content": prompt
+        }
+    )
+
+    with st.chat_message("user"):
+        st.markdown(prompt)
+
+    with st.chat_message("assistant"):
+        with st.spinner("🤖 Kabitix is thinking..."):
+            reply = get_ai_response(prompt, pdf_text)
+
+        st.markdown(reply)
+
+        try:
+            audio_file = speak(reply)
+            if audio_file:
+                st.audio(audio_file)
+        except Exception as e:
+            st.warning("🔊 Voice reply unavailable.")
 
     st.session_state.messages.append(
-    {
-        "role": "user",
-        "content": prompt
-    }
-)
-
-with st.chat_message("user"):
-    st.markdown(prompt)
-
-with st.chat_message("assistant"):
-
-    with st.spinner("🤖 Kabitix is thinking..."): 
-        reply = get_ai_response(prompt, pdf_text)
-
-    audio_file = speak(reply)
-    st.audio(audio_file)
-
-    st.markdown(reply)
-
-st.session_state.messages.append(
-    {
-        "role": "assistant",
-        "content": reply
-    }
-) 
+        {
+            "role": "assistant",
+            "content": reply
+        }
+    )  
