@@ -8,3 +8,4 @@ gtts
 python-docx
 pandas
 openpyxl 
+huggingface_hub
