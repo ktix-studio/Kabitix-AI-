@@ -1,25 +1,21 @@
-import requests
 import os
+from huggingface_hub import InferenceClient
 
-API_URL = "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell" 
-
-headers = {
-    "Authorization": f"Bearer {os.getenv('HUGGINGFACE_API_KEY')}",
-    "Content-Type": "application/json"
-}
 
 def generate_image(prompt):
-    response = requests.post(
-        API_URL,
-        headers=headers,
-        json={
-            "inputs": prompt
-        }
-    )
+    try:
+        client = InferenceClient(
+            api_key=os.getenv("HUGGINGFACE_API_KEY"),
+            provider="auto"
+        )
 
-    if response.status_code == 200:
-        return response.content
+        image = client.text_to_image(
+            prompt=prompt,
+            model="black-forest-labs/FLUX.1-schnell"
+        )
 
-    print(response.status_code)
-    print(response.text)
-    return None 
+        return image
+
+    except Exception as e:
+        print(f"Image generation error: {e}")
+        return None
