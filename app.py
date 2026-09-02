@@ -291,54 +291,31 @@ for message in st.session_state.messages:
 
 
 # =========================
-# VOICE INPUT
+# CHAT & VOICE INPUT
 # =========================
 
 prompt = None
 
+# 1. The Chat Box
+text_prompt = st.chat_input("💬 Ask anything...")
+
+if text_prompt:
+    prompt = text_prompt
+
+# 2. The Mic (Right below the chat box)
 voice = mic_recorder(
-    start_prompt="🎤 Speak",
-    stop_prompt="⏹ Stop",
+    start_prompt="🎤",
+    stop_prompt="",
     key="mic"
 )
 
-
 if voice:
-
     try:
-
         with open("voice.wav", "wb") as f:
-
             f.write(voice["bytes"])
-
-
         prompt = speech_to_text("voice.wav")
-
-        if prompt:
-
-            st.success(
-                f"🎤 You said: {prompt}"
-            )
-
     except Exception as e:
-
-        st.error(
-            f"❌ Voice input failed: {e}"
-        )
-
-
-# =========================
-# TEXT CHAT INPUT
-# =========================
-
-text_prompt = st.chat_input(
-    "💬 Ask anything..."
-)
-
-
-if text_prompt:
-
-    prompt = text_prompt
+        st.error(f"❌ Voice failed: {e}")
 
 
 # =========================
