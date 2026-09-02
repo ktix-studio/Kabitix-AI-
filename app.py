@@ -291,126 +291,75 @@ for message in st.session_state.messages:
 
 
 # =========================
-# CHAT & VOICE INPUT
+# CHAT INPUT WITH MIC
 # =========================
 
 prompt = None
 
-# 1. The Chat Box
-# Custom chat input with mic inside
-col1, col2 = st.columns([0.9, 0.1])
+# Create two columns: text input (wide) + mic (small)
+col1, col2 = st.columns([0.85, 0.15])
 
 with col1:
-    text_prompt = st.text_input(
-        " Ask anything...",
-        key="chat_input",
-        label_visibility="collapsed"
+    text_input = st.text_input(
+        "Ask anything...",
+        key="text_chat",
+        label_visibility="collapsed",
+        placeholder="💬 Ask anything..."
     )
-    if text_prompt:
-        prompt = text_prompt
+    if text_input.strip():
+        prompt = text_input
 
 with col2:
     voice = mic_recorder(
-        start_prompt="",
+        start_prompt="🎤",
         stop_prompt="",
-        key="mic_inline"
+        just_once=False,
+        key="voice_recorder"
     )
     if voice:
         try:
             with open("voice.wav", "wb") as f:
                 f.write(voice["bytes"])
             prompt = speech_to_text("voice.wav")
-            st.rerun()
         except Exception as e:
-            st.error(f"❌ Voice failed: {e}") 
+            st.error(f"Voice error: {e}")
 
-# 2. The Mic (Right below the chat box)
-voice = mic_recorder(
-    start_prompt="🎤",
-    stop_prompt="",
-    key="mic"
-)
+# Show previous messages
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
-if voice:
-    try:
-        with open("voice.wav", "wb") as f:
-            f.write(voice["bytes"])
-        prompt = speech_to_text("voice.wav")
-    except Exception as e:
-        st.error(f"❌ Voice failed: {e}")
-
-
-# =========================
-# AI CHAT
-# =========================
-
+# AI Response
 if prompt:
-
-    # Save user message
-
-    st.session_state.messages.append(
-        {
-            "role": "user",
-            "content": prompt
-        }
-    )
-
-
-    # Display user message
-
+    # User message
+    st.session_state.messages.append({
+        "role": "user",
+        "content": prompt
+    })
+    
     with st.chat_message("user"):
-
         st.markdown(prompt)
-
-
-    # Generate AI response
-
+    
+    # AI response
     with st.chat_message("assistant"):
-
-        with st.spinner(
-            "🤖 Kabitix is thinking..."
-        ):
-
+        with st.spinner("🤖 Kabitix is thinking..."):
             try:
-
-                reply = get_ai_response(
-                    prompt,
-                    pdf_text
-                )
-
+                reply = get_ai_response(prompt, pdf_text)
             except Exception as e:
-
-                reply = (
-                    "❌ Sorry, something went wrong.\n\n"
-                    f"Error: `{e}`"
-                )
-
-
-        # Voice reply
-
-        try:
-
-            audio_file = speak(reply)
-
-            if audio_file:
-
-                st.audio(audio_file)
-
-        except Exception:
-
-            pass
-
-
-        # Display response
-
+                reply = f"❌ Error: {e}"
+        
         st.markdown(reply)
-
-
-    # Save assistant message
-
-    st.session_state.messages.append(
-        {
-            "role": "assistant",
-            "content": reply
-        }
-    ) 
+        
+        # Voice reply
+        try:
+            audio_file = speak(reply)
+            if audio_file:
+                st.audio(audio_file)
+        except:
+            pass
+    
+    st.session_state.messages.append({
+        "role": "assistant",
+        "content": reply
+    }) 
+        
