@@ -297,10 +297,32 @@ for message in st.session_state.messages:
 prompt = None
 
 # 1. The Chat Box
-text_prompt = st.chat_input("💬 Ask anything...")
+# Custom chat input with mic inside
+col1, col2 = st.columns([0.9, 0.1])
 
-if text_prompt:
-    prompt = text_prompt
+with col1:
+    text_prompt = st.text_input(
+        " Ask anything...",
+        key="chat_input",
+        label_visibility="collapsed"
+    )
+    if text_prompt:
+        prompt = text_prompt
+
+with col2:
+    voice = mic_recorder(
+        start_prompt="",
+        stop_prompt="",
+        key="mic_inline"
+    )
+    if voice:
+        try:
+            with open("voice.wav", "wb") as f:
+                f.write(voice["bytes"])
+            prompt = speech_to_text("voice.wav")
+            st.rerun()
+        except Exception as e:
+            st.error(f"❌ Voice failed: {e}") 
 
 # 2. The Mic (Right below the chat box)
 voice = mic_recorder(
